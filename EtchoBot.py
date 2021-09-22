@@ -2,11 +2,16 @@ import discord
 import youtube_dl
 from discord.ext import commands
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.members = True
 
 client = commands.Bot(command_prefix='!', intents=intents)
+
 
 @client.event
 async def on_ready():
@@ -38,20 +43,21 @@ async def leave(ctx):
 
 @client.command(pass_context=True)
 async def stop(ctx):
-    voice=discord.utils.get(client.voice_clients, guild=ctx.guild)
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     voice.stop()
 
+
 @client.command(pass_context=True)
-async def play(ctx, url : str):
-    song_there=os.path.isfile("song.webm")
+async def play(ctx, url: str):
+    song_there = os.path.isfile("song.webm")
     try:
         if song_there:
             os.remove("song.webm")
     except PermissionError:
         await ctx.send("Wait for the current playing music to end or use !stop command.")
 
-    voiceChannel=discord.utils.get(ctx.guild.voice_channels)
-    voice=discord.utils.get(client.voice_clients, guild=ctx.guild)
+    voiceChannel = discord.utils.get(ctx.guild.voice_channels)
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
 
     ydl_opts = {
         'format': '249/250/251',
@@ -68,4 +74,5 @@ async def play(ctx, url : str):
             os.rename(file, "song.webm")
     voice.play(discord.FFmpegPCMAudio("song.webm"))
 
-client.run('Mjc0Njk2MzY2MzQ4MDQyMjQw.WIvk7Q.h3Ie8oPDmrfTXlhXHuSZARbVZa0')
+
+client.run(TOKEN)
